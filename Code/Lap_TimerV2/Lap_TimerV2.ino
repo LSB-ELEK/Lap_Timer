@@ -2,7 +2,7 @@
 #include <Wire.h>
 #include <Ultrasonic.h>
 Ultrasonic ultrasonic(3, 4);  // Trig --> 3 || Echo --> 4
-int distance;
+int distancia;
 LiquidCrystal_I2C lcd(0x27, 16,2);
 int m = 0;
 int s = 0;
@@ -34,7 +34,7 @@ long ant_not = 0;
 #define NOT 4
 int estado = 0;
 
-//#define SERIAL
+//#define noSERIAL
 
 
 void setup() {
@@ -59,14 +59,16 @@ void loop() {
     rst = !digitalRead(RST);
     invalid = !digitalRead(INVALID);
     now = millis();
-    if((now-ant_ultra)>20){
+    if((now-ant_ultra)>15){
         ant_ultra = now;
-        distance = ultrasonic.read();
-        Serial.print(distance);Serial.println("cm");
+        distancia = ultrasonic.read();
+        #ifdef SERIAL
+            Serial.print(distancia);Serial.println("cm");
+        #endif
     }
     
     
-    if(distance<20){
+    if(distancia < 20){
         actuador = HIGH;
     }else{
         actuador = LOW;
@@ -115,10 +117,8 @@ void loop() {
           break;
       case NOT:
           LCD_NOT();
-          if((now-ant_not) > 2000){
-              estado = RESET;
-          }
-          ant_not = now;
+          delay(2000);
+          estado = RESET;
           break;
     }
       
